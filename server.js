@@ -16,7 +16,10 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 
-var COMMENTS_FILE = path.join(__dirname, 'comments.json');
+var database = {
+  showEstimates : false,
+  comments : []
+};
 
 app.set('port', (process.env.PORT || 3000));
 
@@ -46,67 +49,44 @@ function sendResponseWithComments(jsonData, res) {
 }
 
 app.get('/api/comments', function(req, res) {
-  fs.readFile(COMMENTS_FILE, function(err, data) {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    var jsonData = JSON.parse(data);
-    sendResponseWithComments(jsonData, res);
-  });
+  sendResponseWithComments(database, res);
 });
+
+function checkForExistingComment(author) {
+  for (var comment of database.comments) {
+    if (comment.author === author) {
+      return comment;
+    }
+  }
+}
 
 app.post('/api/comments', function(req, res) {
-  fs.readFile(COMMENTS_FILE, function(err, data) {
-    if (err) {
-      console.error(err);
-      process.exit(1);
+    var existingComment = checkForExistingComment(req.body.author);
+    if (existingComment) {
+      existingComment.text = req.body.text;
+      existingComment.estimate = req.body.estimate;
+    } else {
+      var newComment = {
+        id: Date.now(),
+        author: req.body.author,
+        text: req.body.text,
+        estimate: req.body.estimate
+      };
+      database.comments.push(newComment);
     }
-    var commentData = JSON.parse(data);
-    var newComment = {
-      id: Date.now(),
-      author: req.body.author,
-      text: req.body.text,
-      estimate: req.body.estimate
-    };
-    commentData.comments.push(newComment);
-    fs.writeFile(COMMENTS_FILE, JSON.stringify(commentData, null, 4), function(err) {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-      sendResponseWithComments(commentData, res);
-    });
-  });
+    sendResponseWithComments(database, res);
 });
 
+
 app.post('/api/comments/clear', function(req, res) {
-    var comments = { comments: [], showEstimates: false };
-    fs.writeFile(COMMENTS_FILE, JSON.stringify(comments, null, 4), function(err) {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-      res.json(comments);
-    });
+    database.comments = [];
+    database.showEstimates = false;
+    res.json(database.comments);
 });
 
 app.post('/api/comments/show', function(req, res) {
-  fs.readFile(COMMENTS_FILE, function(err, data) {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    var comments = JSON.parse(data);
-    comments.showEstimates = true;
-    fs.writeFile(COMMENTS_FILE, JSON.stringify(comments, null, 4), function(err) {
-      if (err) {
-        console.error(err);
-        process.exit(1);
-      }
-      res.json(comments);
-    });
-  });
+  database.showEstimates = true;
+  res.json(database.comments);
 });
 
 

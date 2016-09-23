@@ -15,9 +15,22 @@ var CommentBox = React.createClass({
       }.bind(this)
     });
   },
+  checkForExistingComment: function(comments, author) {
+    for (var comment of comments) {
+      if (comment.author === author) {
+        return comment;
+      }
+    }
+  },
   handleCommentSubmit: function(comment) {
     var comments = this.state.data;
-    comments = comments.concat([{ author: comment.author, id: comment.id}]);
+    var existingComment = this.checkForExistingComment(comments, comment.author);
+    if (existingComment) {
+      existingComment.estimate = comment.estimate;
+      existingComment.text = comment.text;
+    } else {
+        comments = comments.concat([{ author: comment.author, id: comment.id}]);
+    }
     this.setState({data: comments});
     $.ajax({
       url: this.props.url,
