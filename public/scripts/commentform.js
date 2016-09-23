@@ -10,13 +10,15 @@ var CommentForm = React.createClass({
     this.setState({text: e.target.value});
   },
   handleEstimateChange: function(e) {
-    this.setState({estimate: parseInt(e.target.value, 10)});
+    // this.setState({estimate: parseInt(e.target.value, 10)});
+    this.setState({estimate: e.target.value});
   },
   handleSubmit: function(e) {
     e.preventDefault();
     var author = this.state.author.trim();
     var text = this.state.text.trim();
-    var estimate = parseInt(this.state.estimate, 10);
+    // var estimate = parseInt(this.state.estimate, 10);
+    var estimate = this.state.estimate.trim();
     if (!author || !estimate) {
       return;
     }
@@ -33,7 +35,7 @@ var CommentForm = React.createClass({
           onChange={this.handleAuthorChange}
         />
         <input
-          type="number"
+          type="text"
           placeholder="Estimate"
           value={this.state.estimate}
           onChange={this.handleEstimateChange}

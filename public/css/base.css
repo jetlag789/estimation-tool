@@ -76,3 +76,7 @@ ul {
 .commentText {
   display: inline-block;
 }
+
+.popupWindowLink {
+  font-size: 0.7em;
+}
