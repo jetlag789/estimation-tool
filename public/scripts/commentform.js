@@ -23,7 +23,7 @@ var CommentForm = React.createClass({
       return;
     }
     this.props.onCommentSubmit({author: author, text: text, estimate: estimate});
-    this.setState({author: this.state.author, text: '', estimate: ''});
+    this.setState({author: this.state.author, text: ''});
   },
   render: function() {
     return (

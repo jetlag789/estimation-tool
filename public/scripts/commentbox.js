@@ -61,18 +61,20 @@ var CommentBox = React.createClass({
     });
   },
   handleEstimateShow: function() {
-    $.ajax({
-      url: this.props.url + "/show",
-      dataType: 'json',
-      cache: false,
-      type: 'POST',
-      success: function(data) {
-        this.setState({data: data});
-      }.bind(this),
-      error: function(xhr, status, err) {
-        console.error(this.props.url, status, err.toString());
-      }.bind(this)
-    });
+    if (window.confirm("Are you sure you want to show the estimates?")) {
+      $.ajax({
+        url: this.props.url + "/show",
+        dataType: 'json',
+        cache: false,
+        type: 'POST',
+        success: function(data) {
+          this.setState({data: data});
+        }.bind(this),
+        error: function(xhr, status, err) {
+          console.error(this.props.url, status, err.toString());
+        }.bind(this)
+      });
+    }
   },
   componentDidMount: function() {
     this.loadCommentsFromServer();
